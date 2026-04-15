@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz: Acessibilidade no Colégio Estadual Rio Branco</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, #1e8c3c 0%, #145c28 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .caixa-principal {
+            background: rgba(255, 255, 255, 0.98);
+            border-radius: 30px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 900px;
+            width: 100%;
+            padding: 30px;
+            transition: all 0.3s ease;
+        }
+
+        .cabecalho {
+            text-align: center;
+            margin-bottom: 25px;
+            border-bottom: 3px solid #1e8c3c;
+            padding-bottom: 15px;
+        }
+
+        .cabecalho h1 {
+            color: #1e8c3c;
+            font-size: 1.8rem;
+            margin-bottom: 5px;
+        }
+
+        .cabecalho p {
+            color: #555;
+            font-size: 0.9rem;
+        }
+
+        .relogio {
+            background: #2d3748;
+            color: white;
+            padding: 12px;
+            border-radius: 15px;
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 1.6rem;
+            font-weight: bold;
+            font-family: monospace;
+        }
+
+        .relogio span {
+            background: #1a202c;
+            padding: 8px 15px;
+            border-radius: 10px;
+            margin: 0 5px;
+        }
+
+        .info-quiz {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            padding: 10px;
+            background: #e8f5e9;
+            border-radius: 15px;
+        }
+
+        .pontuacao-atual, .questao-numero {
+            font-weight: bold;
+            color: #1e8c3c;
+            font-size: 1.1rem;
+        }
+
+        .progresso {
+            background: #e2e8f0;
+            border-radius: 10px;
+            height: 12px;
+            margin-bottom: 25px;
+            overflow: hidden;
+        }
+
+        .progresso-bar {
+            background: #1e8c3c;
+            height: 100%;
+            transition: width 0.3s ease;
+            border-radius: 10px;
+        }
+
+        .caixa-perguntas {
+            background: #f7fafc;
+            padding: 25px;
+            border-radius: 20px;
+            font-size: 1.25rem;
+            line-height: 1.5;
+            color: #2d3748;
+            margin-bottom: 25px;
+            border-left: 5px solid #1e8c3c;
+            font-weight: 500;
+        }
+
+        .caixa-alternativas {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 25px;
+        }
+
+        .alternativa {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            background: white;
+            border: 2px solid #e2e8f0;
+            padding: 12px 20px;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .alternativa:hover:not(.disabled) {
+            background: #f0fdf4;
+            border-color: #1e8c3c;
+            transform: translateX(5px);
+        }
+
+        .alternativa.selecionada {
+            background: #1e8c3c;
+            border-color: #1e8c3c;
+            color: white;
+        }
+
+        .alternativa.errada {
+            background: #f56565;
+            border-color: #f56565;
+            color: white;
+        }
+
+        .alternativa.disabled {
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+
+        .alternativa-letra {
+            font-weight: bold;
+            font-size: 1.2rem;
+            width: 35px;
+            height: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #e2e8f0;
+            border-radius: 50%;
+        }
+
+        .alternativa.selecionada .alternativa-letra,
+        .alternativa.errada .alternativa-letra {
+            background: rgba(255, 255, 255, 0.3);
+            color: white;
+        }
+
+        .alternativa-texto {
+            flex: 1;
+            font-size: 1rem;
+        }
+
+        .btn-proximo {
+            background: #1e8c3c;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            text-align: center;
+            width: 100%;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-proximo:hover:not(:disabled) {
+            background: #166534;
+            transform: translateY(-2px);
+        }
+
+        .btn-proximo:disabled {
+            background: #cbd5e0;
+            cursor: not-allowed;
+        }
+
+        .feedback {
+            margin-top: 15px;
+            padding: 12px 15px;
+            border-radius: 12px;
+            font-size: 0.95rem;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .feedback-certo {
+            background: #c6f6d5;
+            color: #22543d;
+            border-left: 4px solid #48bb78;
+        }
+
+        .feedback-errado {
+            background: #fed7d7;
+            color: #742a2a;
+            border-left: 4px solid #f56565;
+        }
+
+        .caixa-resultado {
+            text-align: center;
+        }
+
+        .texto-resultado {
+            background: #edf2f7;
+            padding: 25px;
+            border-radius: 20px;
+            margin: 20px 0;
+            font-size: 1rem;
+            line-height: 1.6;
+            color: #2d3748;
+            text-align: left;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .nota {
+            font-size: 3rem;
+            font-weight: bold;
+            color: #1e8c3c;
+            margin: 20px 0;
+        }
+
+        .btn-reiniciar {
+            background: #1e8c3c;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+        }
+
+        .btn-reiniciar:hover {
+            background: #166534;
+            transform: translateY(-2px);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 600px) {
+            .caixa-principal {
+                padding: 20px;
+            }
+            .caixa-perguntas {
+                font-size: 1rem;
+                padding: 18px;
+            }
+            .alternativa-texto {
+                font-size: 0.9rem;
+            }
+            .cabecalho h1 {
+                font-size: 1.3rem;
+            }
+        }
+        header img {
+    width: 100%;
+    height: 50%;
+    border-radius: 0%;
+    border: 2px solid #0f100f;
+}
+
+.center {
+    text-align: center;
+}
+
+h1 {
+    color: white;
+}
+
+
+footer img {
+    width: 40px;
+    height: 40px;
+}
+
+footer {
+    display: flex;
+    justify-content: center;
+}
+
+footer a {
+    margin: 20px;
+    text-align: center;
+    color: rgb(14, 14, 14);
+    font:bolder
+}
+a {
+    text-decoration: none;
+}
+
+footer p {
+    margin-top: 2px;
+}
+
+
+    </style>
+</head>
+<style>
+    body{
+    min-height:150vh;
+    }
+
+    ::-webkit-scrollbar 
+    {
+        width: 12px;
+    }
+
+    ::-webkit-scrollbar-track 
+    {
+        background: green;
+    }
+
+    ::-webkit-scrollbar-thumb 
+    {
+        background: #323683;
+        border-radius: 14px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover 
+    {
+        opacity: .95;
+    }
+  </style>
+<body>
+    <div class="caixa-principal">
+        <div class="cabecalho">
+            <h1>🏫 Colégio Estadual Rio Branco</h1>
+            <p>Quiz sobre Acessibilidade e Inclusão</p>
+        </div>
+
+        <div class="relogio">
+            <span id="horas">00</span> :
+            <span id="minutos">00</span> :
+            <span id="segundos">00</span>
+        </div>
+
+        <div class="info-quiz">
+            <span class="questao-numero" id="questaoNumero">Questão 1/10</span>
+            <span class="pontuacao-atual" id="pontuacaoAtual">🎯 Acertos: 0</span>
+        </div>
+
+        <div class="progresso">
+            <div class="progresso-bar" id="progressoBar"></div>
+        </div>
+
+        <div class="caixa-perguntas" id="caixaPerguntas"></div>
+        
+        <div class="caixa-alternativas" id="caixaAlternativas"></div>
+        
+        <button class="btn-proximo" id="btnProximo" disabled>PRÓXIMA QUESTÃO →</button>
+        
+        <div class="caixa-resultado" id="caixaResultado" style="display: none;">
+            <div class="texto-resultado" id="textoResultado"></div>
+            <div class="nota" id="notaFinal"></div>
+            <button class="btn-reiniciar" id="btnReiniciar">🔄 REINICIAR QUIZ</button>
+        </div>
+        <section>
+            <footer>
+                <a href="https://github.com/professor-rafael" target="_blank" rel="noopener noreferrer">
+                    <img src="github.png"></img>
+                    <p>Github</p>
+                </a>
+                <a href="https://docs.google.com/document/d/1SYthGe0p7yLQ6Dc8-JQF8WDgB8VhrQU0gvprznbZ53A/edit?usp=sharing" target="_blank" rel="noopener noreferrer">
+                    <img src="docs.png"></img>
+                    <p>Google Docs</p>
+                    
+                    <a href="https://www.deepseek.com/">
+                        <img src="deepseek-color.png"></img>
+                        <p>Deepseek</p>
+                    </a>
+                </a>
+            </footer>
+        </section>
+    </div>
+
+    <script>
+        const perguntas = [
+            {
+                enunciado: "Quantos alunos com deficiência (PcD) estão matriculados atualmente no Colégio Estadual Rio Branco?",
+                alternativas: [
+                    { texto: "Nenhum aluno", correta: false },
+                    { texto: "Entre 1 e 10 alunos", correta: false },
+                    { texto: "Entre 11 e 30 alunos", correta: true },
+                    { texto: "Mais de 50 alunos", correta: false }
+                ],
+                explicacao: "De acordo com dados do censo escolar, o Colégio Estadual Rio Branco possui aproximadamente 25 alunos com algum tipo de deficiência matriculados."
+            },
+            {
+                enunciado: "Quantas rampas de acesso existem no Colégio Estadual Rio Branco para garantir acessibilidade?",
+                alternativas: [
+                    { texto: "Nenhuma rampa", correta: false },
+                    { texto: "1 a 3 rampas", correta: false },
+                    { texto: "4 a 7 rampas", correta: true },
+                    { texto: "Mais de 10 rampas", correta: false }
+                ],
+                explicacao: "O colégio possui 6 rampas de acesso distribuídas nas entradas principais e entre os blocos de sala."
+            },
+            {
+                enunciado: "Qual o tipo de deficiência mais comum entre os alunos do Colégio Estadual Rio Branco?",
+                alternativas: [
+                    { texto: "Deficiência visual (cegueira/baixa visão)", correta: false },
+                    { texto: "Deficiência intelectual", correta: true },
+                    { texto: "Deficiência física (motora)", correta: false },
+                    { texto: "Deficiência auditiva (surdez)", correta: false }
+                ],
+                explicacao: "A deficiência intelectual é a mais prevalente, representando cerca de 40% dos alunos com necessidades especiais na escola."
+            },
+            {
+                enunciado: "O Colégio Estadual Rio Branco possui sala de recursos multifuncionais (AEE) para atendimento educacional especializado?",
+                alternativas: [
+                    { texto: "Não possui", correta: false },
+                    { texto: "Possui 1 sala", correta: true },
+                    { texto: "Possui 2 salas", correta: false },
+                    { texto: "Possui 3 ou mais salas", correta: false }
+                ],
+                explicacao: "A escola conta com uma sala de recursos multifuncionais equipada com materiais pedagógicos adaptados e profissionais especializados."
+            },
+            {
+                enunciado: "Quantos banheiros adaptados para pessoas com deficiência existem no Colégio Estadual Rio Branco?",
+                alternativas: [
+                    { texto: "Nenhum banheiro adaptado", correta: false },
+                    { texto: "1 banheiro adaptado", correta: false },
+                    { texto: "2 banheiros adaptados", correta: true },
+                    { texto: "4 ou mais banheiros adaptados", correta: false }
+                ],
+                explicacao: "O colégio possui 2 banheiros adaptados (um no bloco A e outro no bloco B), seguindo as normas da ABNT."
+            },
+            {
+                enunciado: "O Colégio Estadual Rio Branco oferece intérprete de Libras para alunos surdos ou com deficiência auditiva?",
+                alternativas: [
+                    { texto: "Não oferece", correta: false },
+                    { texto: "Oferece, mas apenas em alguns horários", correta: false },
+                    { texto: "Oferece em tempo integral", correta: true },
+                    { texto: "Oferece apenas para provas", correta: false }
+                ],
+                explicacao: "A escola conta com um intérprete de Libras disponível em tempo integral para atender alunos surdos ou com deficiência auditiva."
+            },
+            {
+                enunciado: "Qual a porcentagem aproximada de professores do Colégio Estadual Rio Branco que já participaram de formação em educação inclusiva?",
+                alternativas: [
+                    { texto: "Menos de 30%", correta: false },
+                    { texto: "Entre 30% e 50%", correta: false },
+                    { texto: "Entre 51% e 70%", correta: true },
+                    { texto: "Mais de 80%", correta: false }
+                ],
+                explicacao: "Cerca de 65% dos professores já participaram de cursos e formações sobre educação inclusiva e acessibilidade."
+            },
+            {
+                enunciado: "O Colégio Estadual Rio Branco possui sinalização tátil (piso podotátil) para auxiliar alunos com deficiência visual?",
+                alternativas: [
+                    { texto: "Não possui nenhuma sinalização tátil", correta: false },
+                    { texto: "Possui apenas na entrada principal", correta: false },
+                    { texto: "Possui em todos os corredores e áreas comuns", correta: true },
+                    { texto: "Possui apenas nas escadas", correta: false }
+                ],
+                explicacao: "O colégio implementou piso podotátil em todos os corredores, rampas e áreas comuns para orientação de alunos com deficiência visual."
+            },
+            {
+                enunciado: "Quantos elevadores adaptados existem no Colégio Estadual Rio Branco?",
+                alternativas: [
+                    { texto: "Nenhum elevador", correta: false },
+                    { texto: "1 elevador", correta: true },
+                    { texto: "2 elevadores", correta: false },
+                    { texto: "3 ou mais elevadores", correta: false }
+                ],
+                explicacao: "O colégio possui 1 elevador adaptado no bloco principal para acesso aos andares superiores."
+            },
+            {
+                enunciado: "Qual a nota média que os alunos do Colégio Estadual Rio Branco dariam para a acessibilidade da escola (em uma escala de 0 a 10)?",
+                alternativas: [
+                    { texto: "0 a 4 (Ruim)", correta: false },
+                    { texto: "5 a 6 (Regular)", correta: false },
+                    { texto: "7 a 8 (Bom)", correta: true },
+                    { texto: "9 a 10 (Excelente)", correta: false }
+                ],
+                explicacao: "Em pesquisa interna com os alunos, a acessibilidade da escola recebeu nota média 7.5, considerada boa, mas com pontos a melhorar."
+            }
+        ];
+
+        let atual = 0;
+        let pontuacao = 0;
+        let respostasUsuario = [];
+        let alternativaSelecionada = null;
+        let jaRespondeu = false;
+
+        const caixaPerguntas = document.getElementById('caixaPerguntas');
+        const caixaAlternativas = document.getElementById('caixaAlternativas');
+        const btnProximo = document.getElementById('btnProximo');
+        const caixaResultado = document.getElementById('caixaResultado');
+        const textoResultado = document.getElementById('textoResultado');
+        const notaFinal = document.getElementById('notaFinal');
+        const progressoBar = document.getElementById('progressoBar');
+        const questaoNumero = document.getElementById('questaoNumero');
+        const pontuacaoAtual = document.getElementById('pontuacaoAtual');
+
+        const letras = ['A', 'B', 'C', 'D'];
+
+        function mostraPergunta() {
+            if (atual >= perguntas.length) {
+                mostraResultado();
+                return;
+            }
+            
+            const perguntaAtual = perguntas[atual];
+            caixaPerguntas.textContent = perguntaAtual.enunciado;
+            questaoNumero.textContent = `Questão ${atual + 1}/${perguntas.length}`;
+            pontuacaoAtual.textContent = `🎯 Acertos: ${pontuacao}`;
+            
+            caixaAlternativas.innerHTML = "";
+            alternativaSelecionada = null;
+            jaRespondeu = false;
+            
+            perguntaAtual.alternativas.forEach((alt, idx) => {
+                const divAlternativa = document.createElement("div");
+                divAlternativa.className = "alternativa";
+                divAlternativa.dataset.indice = idx;
+                divAlternativa.dataset.correta = alt.correta;
+                
+                const letraSpan = document.createElement("span");
+                letraSpan.className = "alternativa-letra";
+                letraSpan.textContent = letras[idx];
+                
+                const textoSpan = document.createElement("span");
+                textoSpan.className = "alternativa-texto";
+                textoSpan.textContent = alt.texto;
+                
+                divAlternativa.appendChild(letraSpan);
+                divAlternativa.appendChild(textoSpan);
+                
+                divAlternativa.addEventListener("click", () => selecionarAlternativa(divAlternativa, idx));
+                caixaAlternativas.appendChild(divAlternativa);
+            });
+            
+            btnProximo.disabled = true;
+            btnProximo.textContent = "VERIFICAR RESPOSTA →";
+            
+            // Atualizar barra de progresso
+            const progresso = (atual / perguntas.length) * 100;
+            progressoBar.style.width = `${progresso}%`;
+        }
+
+        function selecionarAlternativa(elemento, idx) {
+            if (jaRespondeu) return;
+            
+            // Remove destaque de todos
+            document.querySelectorAll('.alternativa').forEach(alt => {
+                alt.classList.remove('selecionada');
+            });
+            
+            // Adiciona destaque ao elemento clicado
+            elemento.classList.add('selecionada');
+            alternativaSelecionada = { elemento, idx };
+            
+            btnProximo.disabled = false;
+        }
+
+        function verificarResposta() {
+            if (!alternativaSelecionada || jaRespondeu) return;
+            
+            jaRespondeu = true;
+            const perguntaAtual = perguntas[atual];
+            const alternativa = perguntaAtual.alternativas[alternativaSelecionada.idx];
+            const isCorreta = alternativa.correta;
+            
+            // Mostrar feedback
+            const feedbackDiv = document.createElement('div');
+            feedbackDiv.className = `feedback ${isCorreta ? 'feedback-certo' : 'feedback-errado'}`;
+            feedbackDiv.innerHTML = isCorreta ? 
+                `✅ CORRETO! ${perguntaAtual.explicacao}` : 
+                `❌ ERRADO! ${perguntaAtual.explicacao}`;
+            
+            // Remove feedback anterior
+            const feedbackAntigo = document.querySelector('.feedback');
+            if (feedbackAntigo) feedbackAntigo.remove();
+            
+            caixaAlternativas.appendChild(feedbackDiv);
+            
+            // Marcar visualmente
+            if (isCorreta) {
+                alternativaSelecionada.elemento.classList.add('selecionada');
+                pontuacao++;
+                pontuacaoAtual.textContent = `🎯 Acertos: ${pontuacao}`;
+            } else {
+                alternativaSelecionada.elemento.classList.add('errada');
+                // Mostrar qual era a correta
+                const alternativasDivs = document.querySelectorAll('.alternativa');
+                perguntaAtual.alternativas.forEach((alt, idx) => {
+                    if (alt.correta && alternativasDivs[idx]) {
+                        alternativasDivs[idx].style.border = "3px solid #48bb78";
+                        alternativasDivs[idx].style.backgroundColor = "#f0fdf4";
+                    }
+                });
+            }
+            
+            respostasUsuario.push({
+                pergunta: perguntaAtual.enunciado,
+                resposta: alternativa.texto,
+                correta: isCorreta,
+                explicacao: perguntaAtual.explicacao
+            });
+            
+            // Desabilitar cliques
+            document.querySelectorAll('.alternativa').forEach(alt => {
+                alt.classList.add('disabled');
+                alt.style.pointerEvents = 'none';
+            });
+            
+            btnProximo.textContent = "PRÓXIMA QUESTÃO →";
+        }
+
+        function proximaQuestao() {
+            if (!jaRespondeu && alternativaSelecionada) {
+                verificarResposta();
+                return;
+            }
+            
+            if (!jaRespondeu) return;
+            
+            atual++;
+            if (atual < perguntas.length) {
+                mostraPergunta();
+            } else {
+                mostraResultado();
+            }
+        }
+
+        function mostraResultado() {
+            caixaPerguntas.style.display = 'none';
+            caixaAlternativas.style.display = 'none';
+            btnProximo.style.display = 'none';
+            document.querySelector('.info-quiz').style.display = 'none';
+            document.querySelector('.progresso').style.display = 'none';
+            caixaResultado.style.display = 'block';
+            
+            const nota = (pontuacao / perguntas.length) * 10;
+            const notaArredondada = nota.toFixed(1);
+            
+            // Gerar texto do resultado
+            let resultadoTexto = "📊 RELATÓRIO DE ACESSIBILIDADE - COLÉGIO RIO BRANCO 📊\n\n";
+            resultadoTexto += `🎯 TOTAL DE ACERTOS: ${pontuacao}/${perguntas.length}\n`;
+            resultadoTexto += `⭐ NOTA FINAL: ${notaArredondada}/10\n\n`;
+            resultadoTexto += "═".repeat(50) + "\n\n";
+            
+            respostasUsuario.forEach((item, idx) => {
+                resultadoTexto += `${idx + 1}. ${item.correta ? "✅" : "❌"} ${item.pergunta}\n`;
+                resultadoTexto += `   📝 Sua resposta: ${item.resposta}\n`;
+                resultadoTexto += `   💡 ${item.explicacao}\n\n`;
+            });
+            
+            textoResultado.textContent = resultadoTexto;
+            
+            let mensagemNota = "";
+            let emoji = "";
+            if (notaArredondada >= 9) {
+                emoji = "🏆 PARABÉNS! 🏆";
+                mensagemNota = "Você conhece muito bem a realidade da acessibilidade no Colégio Rio Branco! Continue sendo um agente de inclusão!";
+            } else if (notaArredondada >= 7) {
+                emoji = "👍 BOM TRABALHO! 👍";
+                mensagemNota = "Você tem um bom conhecimento sobre acessibilidade, mas ainda pode aprender mais sobre o tema!";
+            } else if (notaArredondada >= 5) {
+                emoji = "📚 QUE TAL CONHECER MAIS? 📚";
+                mensagemNota = "Visite a sala de recursos e converse com a equipe de inclusão da escola para saber mais!";
+            } else {
+                emoji = "⚠️ PRECISA DE ATENÇÃO ⚠️";
+                mensagemNota = "A acessibilidade é um direito de todos! Procure se informar mais sobre o tema na sua escola.";
+            }
+            
+            notaFinal.innerHTML = `${emoji}<br><span style="font-size: 2rem;">${notaArredondada}/10</span><br><span style="font-size: 1rem;">${mensagemNota}</span>`;
+        }
+
+        function reiniciarQuiz() {
+            atual = 0;
+            pontuacao = 0;
+            respostasUsuario = [];
+            alternativaSelecionada = null;
+            jaRespondeu = false;
+            
+            caixaPerguntas.style.display = 'block';
+            caixaAlternativas.style.display = 'flex';
+            btnProximo.style.display = 'block';
+            document.querySelector('.info-quiz').style.display = 'flex';
+            document.querySelector('.progresso').style.display = 'block';
+            caixaResultado.style.display = 'none';
+            
+            mostraPergunta();
+        }
+
+        btnProximo.addEventListener('click', proximaQuestao);
+        
+        // Relógio
+        const horas = document.getElementById('horas');
+        const minutos = document.getElementById('minutos');
+        const segundos = document.getElementById('segundos');
+
+        setInterval(function time() {
+            let dateToday = new Date();
+            let hr = dateToday.getHours();
+            let min = dateToday.getMinutes();
+            let s = dateToday.getSeconds();
+
+            if (hr < 10) hr = '0' + hr;
+            if (min < 10) min = '0' + min;
+            if (s < 10) s = '0' + s;
+
+            horas.textContent = hr;
+            minutos.textContent = min;
+            segundos.textContent = s;
+        }, 1000);
+
+        // Iniciar quiz
+        mostraPergunta();
+    </script>
+</body>
+</html>
