@@ -2,7 +2,7 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
     <title>Quiz: Acessibilidade no Colégio Estadual Rio Branco</title>
     <style>
         * {
@@ -21,7 +21,7 @@
             padding: 16px;
         }
 
-        /* CORPO COM BACKGROUND DE IMAGEM (CORRIGIDO) */
+        /* CORPO COM BACKGROUND DE IMAGEM */
         body {
             background: linear-gradient(rgba(30, 140, 60, 0.85), rgba(20, 92, 40, 0.9)), url('debg-sktop.webp');
             background-size: cover;
@@ -39,7 +39,6 @@
             transition: all 0.3s ease;
         }
 
-        /* RESPONSIVO: REDUZ PADDING EM CELULARES */
         @media (max-width: 600px) {
             .caixa-principal {
                 padding: 16px;
@@ -58,11 +57,10 @@
             color: #1e8c3c;
             font-size: clamp(1.3rem, 5vw, 1.8rem);
             margin-bottom: 5px;
-            word-break: break-word;
         }
 
         .cabecalho p {
-            color: #555;
+            color: #2d3748;
             font-size: clamp(0.8rem, 3vw, 0.9rem);
         }
 
@@ -137,7 +135,6 @@
             margin-bottom: 25px;
             border-left: 5px solid #1e8c3c;
             font-weight: 500;
-            word-break: break-word;
         }
 
         @media (max-width: 480px) {
@@ -166,6 +163,12 @@
             transition: all 0.2s ease;
         }
 
+        .alternativa:focus-visible {
+            outline: 3px solid #1e8c3c;
+            outline-offset: 2px;
+            transform: scale(1.01);
+        }
+
         @media (max-width: 480px) {
             .alternativa {
                 padding: 10px 12px;
@@ -177,12 +180,6 @@
             background: #f0fdf4;
             border-color: #1e8c3c;
             transform: translateX(5px);
-        }
-
-        @media (max-width: 480px) {
-            .alternativa:hover:not(.disabled) {
-                transform: translateX(2px);
-            }
         }
 
         .alternativa.selecionada {
@@ -215,14 +212,6 @@
             flex-shrink: 0;
         }
 
-        @media (max-width: 480px) {
-            .alternativa-letra {
-                width: 28px;
-                height: 28px;
-                font-size: 0.9rem;
-            }
-        }
-
         .alternativa.selecionada .alternativa-letra,
         .alternativa.errada .alternativa-letra {
             background: rgba(255, 255, 255, 0.3);
@@ -249,6 +238,11 @@
             transition: all 0.3s ease;
         }
 
+        .btn-proximo:focus-visible {
+            outline: 3px solid #ffd966;
+            outline-offset: 2px;
+        }
+
         .btn-proximo:hover:not(:disabled) {
             background: #166534;
             transform: translateY(-2px);
@@ -265,7 +259,6 @@
             border-radius: 12px;
             font-size: clamp(0.85rem, 3.5vw, 0.95rem);
             animation: fadeIn 0.3s ease;
-            word-break: break-word;
         }
 
         .feedback-certo {
@@ -295,7 +288,6 @@
             text-align: left;
             max-height: 450px;
             overflow-y: auto;
-            word-break: break-word;
             white-space: pre-wrap;
         }
 
@@ -321,12 +313,16 @@
             max-width: 280px;
         }
 
+        .btn-reiniciar:focus-visible {
+            outline: 3px solid #ffd966;
+            outline-offset: 2px;
+        }
+
         .btn-reiniciar:hover {
             background: #166534;
             transform: translateY(-2px);
         }
 
-        /* FOOTER RESPONSIVO */
         footer {
             display: flex;
             justify-content: center;
@@ -343,6 +339,11 @@
             align-items: center;
             text-decoration: none;
             transition: transform 0.2s ease;
+        }
+
+        footer a:focus-visible {
+            outline: 2px solid #1e8c3c;
+            border-radius: 8px;
         }
 
         footer a:hover {
@@ -364,7 +365,7 @@
 
         footer p {
             margin-top: 5px;
-            color: #4a5568;
+            color: #2d3748;
             font-size: 0.75rem;
             font-weight: 600;
         }
@@ -374,7 +375,6 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* SCROLLBAR PERSONALIZADA */
         ::-webkit-scrollbar {
             width: 10px;
         }
@@ -388,59 +388,58 @@
             background: #1e8c3c;
             border-radius: 10px;
         }
-
-        ::-webkit-scrollbar-thumb:hover {
-            background: #166534;
-        }
     </style>
 </head>
 <body>
-    <div class="caixa-principal">
+    <div class="caixa-principal" role="main">
         <div class="cabecalho">
             <h1>🏫 Colégio Estadual Rio Branco</h1>
             <p>Quiz sobre Acessibilidade e Inclusão</p>
-                <link rel="icon" href="icon.png">
-
+            <link rel="icon" href="icon.png">
         </div>
 
-        <div class="relogio">
+        <div class="relogio" aria-live="polite" aria-label="Relógio mostrando a hora atual">
             <span id="horas">00</span> :
             <span id="minutos">00</span> :
             <span id="segundos">00</span>
         </div>
 
         <div class="info-quiz">
-            <span class="questao-numero" id="questaoNumero">Questão 1/10</span>
-            <span class="pontuacao-atual" id="pontuacaoAtual">🎯 Acertos: 0</span>
+            <span class="questao-numero" id="questaoNumero" aria-live="polite">Questão 1/10</span>
+            <span class="pontuacao-atual" id="pontuacaoAtual" aria-live="polite">🎯 Acertos: 0</span>
         </div>
 
-        <div class="progresso">
+        <div class="progresso" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="progressoBarWrapper">
             <div class="progresso-bar" id="progressoBar"></div>
         </div>
 
-        <div class="caixa-perguntas" id="caixaPerguntas"></div>
+        <div class="caixa-perguntas" id="caixaPerguntas" aria-live="polite"></div>
         
-        <div class="caixa-alternativas" id="caixaAlternativas"></div>
+        <div class="caixa-alternativas" id="caixaAlternativas" role="group" aria-label="Opções de resposta"></div>
         
-        <button class="btn-proximo" id="btnProximo" disabled>PRÓXIMA QUESTÃO →</button>
+        <button class="btn-proximo" id="btnProximo" disabled aria-label="Próxima questão ou verificar resposta">PRÓXIMA QUESTÃO →</button>
         
-        <div class="caixa-resultado" id="caixaResultado" style="display: none;">
-            <div class="texto-resultado" id="textoResultado"></div>
+        <div class="caixa-resultado" id="caixaResultado" style="display: none;" aria-live="polite">
+            <div class="texto-resultado" id="textoResultado" tabindex="0"></div>
             <div class="nota" id="notaFinal"></div>
-            <button class="btn-reiniciar" id="btnReiniciar">🔄 REINICIAR QUIZ</button>
+            <button class="btn-reiniciar" id="btnReiniciar" aria-label="Reiniciar o quiz">🔄 REINICIAR QUIZ</button>
         </div>
 
         <footer>
-            <a href="https://github.com/professor-rafael" target="_blank" rel="noopener noreferrer">
-                <img src="github.png" alt="GitHub">
+            <a href="https://github.com/professor-rafael" target="_blank" rel="noopener noreferrer" aria-label="GitHub do professor Rafael">
+                <img src="github.png" alt="Logo do GitHub">
                 <p>Github</p>
             </a>
-            <a href="https://canva.link/irtwmovt8wgn3bk" target="_blank" rel="noopener noreferrer">
-                <img src="palette.png" alt="Google Slides">
+            <a href="https://canva.link/irtwmovt8wgn3bk" target="_blank" rel="noopener noreferrer" aria-label="Link para o Canva">
+                <img src="palette.png" alt="Logo do Canva">
                 <p>Canva</p>
             </a>
-            <a href="https://www.deepseek.com/" target="_blank">
-                <img src="deepseek-color.png" alt="Deepseek">
+            <a href="https://docs.google.com/forms/d/1e8Q0V22EgUXEXzCME82jb0597y6YjBzHFdoeBzobVDE/edit#question=1089937116&field=1226936784" target="_blank" rel="noopener noreferrer" aria-label="Link para o Canva">
+                <img src="google-forms.png" alt="Logo do Google forms">
+                <p>Google Forms</p>
+            </a>
+            <a href="https://www.deepseek.com/" target="_blank" rel="noopener noreferrer" aria-label="Link para o Deepseek">
+                <img src="deepseek-color.png" alt="Logo do Deepseek">
                 <p>Deepseek</p>
             </a>
         </footer>
@@ -563,6 +562,7 @@
         const textoResultado = document.getElementById('textoResultado');
         const notaFinal = document.getElementById('notaFinal');
         const progressoBar = document.getElementById('progressoBar');
+        const progressoBarWrapper = document.getElementById('progressoBarWrapper');
         const questaoNumero = document.getElementById('questaoNumero');
         const pontuacaoAtual = document.getElementById('pontuacaoAtual');
         const btnReiniciar = document.getElementById('btnReiniciar');
@@ -589,10 +589,14 @@
                 divAlternativa.className = "alternativa";
                 divAlternativa.dataset.indice = idx;
                 divAlternativa.dataset.correta = alt.correta;
+                divAlternativa.tabIndex = 0;
+                divAlternativa.setAttribute("role", "button");
+                divAlternativa.setAttribute("aria-label", `Alternativa ${letras[idx]}: ${alt.texto}`);
                 
                 const letraSpan = document.createElement("span");
                 letraSpan.className = "alternativa-letra";
                 letraSpan.textContent = letras[idx];
+                letraSpan.setAttribute("aria-hidden", "true");
                 
                 const textoSpan = document.createElement("span");
                 textoSpan.className = "alternativa-texto";
@@ -602,6 +606,12 @@
                 divAlternativa.appendChild(textoSpan);
                 
                 divAlternativa.addEventListener("click", () => selecionarAlternativa(divAlternativa, idx));
+                divAlternativa.addEventListener("keypress", (e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        selecionarAlternativa(divAlternativa, idx);
+                    }
+                });
                 caixaAlternativas.appendChild(divAlternativa);
             });
             
@@ -610,6 +620,9 @@
             
             const progresso = (atual / perguntas.length) * 100;
             progressoBar.style.width = `${progresso}%`;
+            if (progressoBarWrapper) {
+                progressoBarWrapper.setAttribute("aria-valuenow", progresso);
+            }
         }
 
         function selecionarAlternativa(elemento, idx) {
@@ -617,12 +630,15 @@
             
             document.querySelectorAll('.alternativa').forEach(alt => {
                 alt.classList.remove('selecionada');
+                alt.setAttribute("aria-selected", "false");
             });
             
             elemento.classList.add('selecionada');
+            elemento.setAttribute("aria-selected", "true");
             alternativaSelecionada = { elemento, idx };
             
             btnProximo.disabled = false;
+            btnProximo.focus();
         }
 
         function verificarResposta() {
@@ -635,6 +651,8 @@
             
             const feedbackDiv = document.createElement('div');
             feedbackDiv.className = `feedback ${isCorreta ? 'feedback-certo' : 'feedback-errado'}`;
+            feedbackDiv.setAttribute("role", "status");
+            feedbackDiv.setAttribute("aria-live", "polite");
             feedbackDiv.innerHTML = isCorreta ? 
                 `✅ CORRETO! ${perguntaAtual.explicacao}` : 
                 `❌ ERRADO! ${perguntaAtual.explicacao}`;
@@ -655,6 +673,7 @@
                     if (alt.correta && alternativasDivs[idx]) {
                         alternativasDivs[idx].style.border = "3px solid #48bb78";
                         alternativasDivs[idx].style.backgroundColor = "#f0fdf4";
+                        alternativasDivs[idx].setAttribute("aria-label", `Alternativa correta: ${alt.texto}`);
                     }
                 });
             }
@@ -669,6 +688,7 @@
             document.querySelectorAll('.alternativa').forEach(alt => {
                 alt.classList.add('disabled');
                 alt.style.pointerEvents = 'none';
+                alt.tabIndex = -1;
             });
             
             btnProximo.textContent = "PRÓXIMA QUESTÃO →";
